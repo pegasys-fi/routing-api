@@ -153,7 +153,7 @@ export class RoutingAPIPipeline extends Stack {
 
     // Beta us-east-2
     const betaUsEast2Stage = new RoutingAPIStage(this, 'beta-us-east-2', {
-      env: { account: '145079444317', region: 'us-east-2' },
+      env: { account: '868337811334', region: 'us-east-2' },
       jsonRpcProviders: jsonRpcProviders,
       provisionedConcurrency: 100,
       ethGasStationInfoUrl: ethGasStationInfoUrl.secretValue.toString(),
@@ -173,7 +173,7 @@ export class RoutingAPIPipeline extends Stack {
 
     // Prod us-east-2
     const prodUsEast2Stage = new RoutingAPIStage(this, 'prod-us-east-2', {
-      env: { account: '606857263320', region: 'us-east-2' },
+      env: { account: '868337811334', region: 'us-east-2' },
       jsonRpcProviders: jsonRpcProviders,
       provisionedConcurrency: 100,
       ethGasStationInfoUrl: ethGasStationInfoUrl.secretValue.toString(),
@@ -249,7 +249,7 @@ const jsonRpcProviders = {
 }
 
 // Local dev stack
-new RoutingAPIStack(app, 'RoutingAPIStack', {
+new RoutingAPIStack(app, 'RoutingAPIStackDev', {
   jsonRpcProviders: jsonRpcProviders,
   provisionedConcurrency: process.env.PROVISION_CONCURRENCY ? parseInt(process.env.PROVISION_CONCURRENCY) : 0,
   throttlingOverride: process.env.THROTTLE_PER_FIVE_MINS,
@@ -265,6 +265,24 @@ new RoutingAPIStack(app, 'RoutingAPIStack', {
   tenderlyAccessKey: process.env.TENDERLY_ACCESS_KEY!,
 })
 
-new RoutingAPIPipeline(app, 'RoutingAPIPipelineStack', {
-  env: { account: '644039819003', region: 'us-east-2' },
+// Local Prod stack
+new RoutingAPIStack(app, 'RoutingAPIStackProd', {
+  env: { account: '868337811334', region: 'us-east-2' },
+  jsonRpcProviders: jsonRpcProviders,
+  provisionedConcurrency: process.env.PROVISION_CONCURRENCY ? parseInt(process.env.PROVISION_CONCURRENCY) : 0,
+  throttlingOverride: process.env.THROTTLE_PER_FIVE_MINS,
+  ethGasStationInfoUrl: process.env.ETH_GAS_STATION_INFO_URL!,
+  chatbotSNSArn: process.env.CHATBOT_SNS_ARN,
+  stage: STAGE.PROD,
+  route53Arn: process.env.ROLE_ARN,
+  pinata_key: process.env.PINATA_API_KEY!,
+  pinata_secret: process.env.PINATA_API_SECRET!,
+  hosted_zone: process.env.HOSTED_ZONE!,
+  tenderlyUser: process.env.TENDERLY_USER!,
+  tenderlyProject: process.env.TENDERLY_PROJECT!,
+  tenderlyAccessKey: process.env.TENDERLY_ACCESS_KEY!,
 })
+
+// new RoutingAPIPipeline(app, 'RoutingAPIPipelineStack', {
+//   env: { account: '868337811334', region: 'us-east-2' },
+// })
