@@ -1,7 +1,7 @@
 import { Protocol } from '@pollum-io/router-sdk'
 import {
   ChainId,
-  // V2SubgraphProvider,
+  V2SubgraphProvider,
   V3SubgraphProvider,
 } from '@pollum-io/smart-order-router'
 
@@ -39,10 +39,10 @@ export const chainProtocols = [
   // },
   // // Currently there is no working V3 subgraph for Optimism so we use a static provider.
   // // V2.
-  // {
-  //   protocol: Protocol.V1,
-  //   chainId: ChainId.MAINNET,
-  //   timeout: 840000,
-  //   provider: new V2SubgraphProvider(ChainId.MAINNET, 3, 900000, true, 250),
-  // },
+  {
+    protocol: Protocol.V1,
+    chainId: ChainId.ROLLUX,
+    timeout: 840000,
+    provider: new V2SubgraphProvider(ChainId.ROLLUX, 3, 900000, true, 250),
+  },
 ]
