@@ -991,10 +991,10 @@
     tiny-invariant "^1.1.0"
     toformat "^2.0.0"
 
-"@pollum-io/smart-order-router@0.0.22":
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/@pollum-io/smart-order-router/-/smart-order-router-0.0.22.tgz#0c6a813b034f7166062e7b14362c5c029c6b4a1a"
-  integrity sha512-RROIj8vtTTqdAnNInJ2A18oN07bNGwXE0vciEjUVVl4W68TJytM0nKA6J6w5zIelAf91sHkM+6EDNTwZ1rtaBw==
+"@pollum-io/smart-order-router@0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@pollum-io/smart-order-router/-/smart-order-router-0.0.24.tgz#e4dcb41fb69c41f2dbf02924b5566a9ffdbe8e5d"
+  integrity sha512-vzm6ICDwYfPr8oQcYb5gx68yhOYVYJEY+dvS+ViAtLfdmDObqbCevd3gZneJNqRMMgkWMQmQvUnCi3JTN+VG7g==
   dependencies:
     "@pollum-io/default-token-list" latest
     "@pollum-io/router-sdk" "0.0.6"
