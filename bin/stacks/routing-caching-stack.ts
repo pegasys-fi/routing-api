@@ -38,7 +38,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
   constructor(scope: Construct, name: string, props: RoutingCachingStackProps) {
     super(scope, name, props)
 
-    const { chatbotSNSArn } = props
+    const { chatbotSNSArn, pinata_key, pinata_secret, stage, route53Arn, hosted_zone } = props
 
     const chatBotTopic = chatbotSNSArn ? aws_sns.Topic.fromTopicArn(this, 'ChatbotTopic', chatbotSNSArn) : undefined
 
@@ -54,8 +54,6 @@ export class RoutingCachingStack extends cdk.NestedStack {
     })
 
     this.poolCacheKey = 'poolCache.json'
-
-    const { stage } = props
 
     const lambdaRole = new aws_iam.Role(this, 'RoutingLambdaRole', {
       assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
@@ -91,7 +89,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
         `PoolCacheLambda-ChainId${chainId}-Protocol${protocol}`,
         {
           role: lambdaRole,
-          runtime: aws_lambda.Runtime.NODEJS_14_X,
+          runtime: aws_lambda.Runtime.NODEJS_20_X,
           entry: path.join(__dirname, '../../lib/cron/cache-pools.ts'),
           handler: 'handler',
           timeout: Duration.seconds(900),
@@ -160,75 +158,75 @@ export class RoutingCachingStack extends cdk.NestedStack {
       this.poolCacheLambdaNameArray.push(lambda.functionName)
     }
 
-    // if (stage == STAGE.BETA || stage == STAGE.PROD) {
-    //   this.ipfsPoolCachingLambda = new aws_lambda_nodejs.NodejsFunction(this, 'IpfsPoolCacheLambda', {
-    //     role: lambdaRole,
-    //     runtime: aws_lambda.Runtime.NODEJS_14_X,
-    //     entry: path.join(__dirname, '../../lib/cron/cache-pools-ipfs.ts'),
-    //     handler: 'handler',
-    //     timeout: Duration.seconds(900),
-    //     memorySize: 1024,
-    //     bundling: {
-    //       minify: true,
-    //       sourceMap: true,
-    //     },
-    //     description: 'IPFS Pool Cache Lambda',
-    //     layers: [
-    //       aws_lambda.LayerVersion.fromLayerVersionArn(
-    //         this,
-    //         'InsightsLayerPoolsIPFS',
-    //         `arn:aws:lambda:${region}:580247275435:layer:LambdaInsightsExtension:14`
-    //       ),
-    //     ],
-    //     tracing: aws_lambda.Tracing.ACTIVE,
-    //     environment: {
-    //       PINATA_API_KEY: pinata_key!,
-    //       PINATA_API_SECRET: pinata_secret!,
-    //       ROLE_ARN: route53Arn!,
-    //       HOSTED_ZONE: hosted_zone!,
-    //       STAGE: stage,
-    //       REDEPLOY: '1',
-    //     },
-    //   })
+    if (stage == STAGE.BETA || stage == STAGE.PROD) {
+      this.ipfsPoolCachingLambda = new aws_lambda_nodejs.NodejsFunction(this, 'IpfsPoolCacheLambda', {
+        role: lambdaRole,
+        runtime: aws_lambda.Runtime.NODEJS_20_X,
+        entry: path.join(__dirname, '../../lib/cron/cache-pools-ipfs.ts'),
+        handler: 'handler',
+        timeout: Duration.seconds(900),
+        memorySize: 1024,
+        bundling: {
+          minify: true,
+          sourceMap: true,
+        },
+        description: 'IPFS Pool Cache Lambda',
+        layers: [
+          aws_lambda.LayerVersion.fromLayerVersionArn(
+            this,
+            'InsightsLayerPoolsIPFS',
+            `arn:aws:lambda:${region}:580247275435:layer:LambdaInsightsExtension:14`
+          ),
+        ],
+        tracing: aws_lambda.Tracing.ACTIVE,
+        environment: {
+          PINATA_API_KEY: pinata_key!,
+          PINATA_API_SECRET: pinata_secret!,
+          ROLE_ARN: route53Arn!,
+          HOSTED_ZONE: hosted_zone!,
+          STAGE: stage,
+          REDEPLOY: '1',
+        },
+      })
 
-    //   new aws_events.Rule(this, 'ScheduleIpfsPoolCache', {
-    //     schedule: aws_events.Schedule.rate(Duration.minutes(15)),
-    //     targets: [new aws_events_targets.LambdaFunction(this.ipfsPoolCachingLambda)],
-    //   })
+      new aws_events.Rule(this, 'ScheduleIpfsPoolCache', {
+        schedule: aws_events.Schedule.rate(Duration.minutes(15)),
+        targets: [new aws_events_targets.LambdaFunction(this.ipfsPoolCachingLambda)],
+      })
 
-    //   this.ipfsCleanPoolCachingLambda = new aws_lambda_nodejs.NodejsFunction(this, 'CleanIpfsPoolCacheLambda', {
-    //     role: lambdaRole,
-    //     runtime: aws_lambda.Runtime.NODEJS_14_X,
-    //     entry: path.join(__dirname, '../../lib/cron/clean-pools-ipfs.ts'),
-    //     handler: 'handler',
-    //     timeout: Duration.seconds(900),
-    //     memorySize: 512,
-    //     bundling: {
-    //       minify: true,
-    //       sourceMap: true,
-    //     },
-    //     description: 'Clean IPFS Pool Cache Lambda',
-    //     layers: [
-    //       aws_lambda.LayerVersion.fromLayerVersionArn(
-    //         this,
-    //         'InsightsLayerPoolsCleanIPFS',
-    //         `arn:aws:lambda:${region}:580247275435:layer:LambdaInsightsExtension:14`
-    //       ),
-    //     ],
-    //     tracing: aws_lambda.Tracing.ACTIVE,
-    //     environment: {
-    //       PINATA_API_KEY: pinata_key!,
-    //       PINATA_API_SECRET: pinata_secret!,
-    //       STAGE: stage,
-    //       REDEPLOY: '1',
-    //     },
-    //   })
+      this.ipfsCleanPoolCachingLambda = new aws_lambda_nodejs.NodejsFunction(this, 'CleanIpfsPoolCacheLambda', {
+        role: lambdaRole,
+        runtime: aws_lambda.Runtime.NODEJS_20_X,
+        entry: path.join(__dirname, '../../lib/cron/clean-pools-ipfs.ts'),
+        handler: 'handler',
+        timeout: Duration.seconds(900),
+        memorySize: 512,
+        bundling: {
+          minify: true,
+          sourceMap: true,
+        },
+        description: 'Clean IPFS Pool Cache Lambda',
+        layers: [
+          aws_lambda.LayerVersion.fromLayerVersionArn(
+            this,
+            'InsightsLayerPoolsCleanIPFS',
+            `arn:aws:lambda:${region}:580247275435:layer:LambdaInsightsExtension:14`
+          ),
+        ],
+        tracing: aws_lambda.Tracing.ACTIVE,
+        environment: {
+          PINATA_API_KEY: pinata_key!,
+          PINATA_API_SECRET: pinata_secret!,
+          STAGE: stage,
+          REDEPLOY: '1',
+        },
+      })
 
-    //   new aws_events.Rule(this, 'ScheduleCleanIpfsPoolCache', {
-    //     schedule: aws_events.Schedule.rate(Duration.minutes(30)),
-    //     targets: [new aws_events_targets.LambdaFunction(this.ipfsCleanPoolCachingLambda)],
-    //   })
-    // }
+      new aws_events.Rule(this, 'ScheduleCleanIpfsPoolCache', {
+        schedule: aws_events.Schedule.rate(Duration.minutes(30)),
+        targets: [new aws_events_targets.LambdaFunction(this.ipfsCleanPoolCachingLambda)],
+      })
+    }
 
     console.log(chatBotTopic, chatbotSNSArn)
 
@@ -250,7 +248,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
 
     const tokenListCachingLambda = new aws_lambda_nodejs.NodejsFunction(this, 'TokenListCacheLambda', {
       role: lambdaRole,
-      runtime: aws_lambda.Runtime.NODEJS_14_X,
+      runtime: aws_lambda.Runtime.NODEJS_20_X,
       entry: path.join(__dirname, '../../lib/cron/cache-token-lists.ts'),
       handler: 'handler',
       timeout: Duration.seconds(180),
